@@ -1,0 +1,10 @@
+{
+  "name": "Nursing Pro NG",
+  "short_name": "Nursing Pro",
+  "description": "Your Knowledge. Your Skills. Your Nursing Future.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071426",
+  "theme_color": "#071426",
+  "orientation": "portrait"
+}
