@@ -1,38 +1,67 @@
 // NURSING PRO NG
-// Main application JavaScript
+// Main application functionality
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
 
-  console.log("Nursing Pro NG is ready!");
+  const startButton = document.getElementById("startLearning");
+  const dashboard = document.getElementById("dashboard");
 
-  // Display a welcome message
-  const welcomeMessage = () => {
-    const hour = new Date().getHours();
-
-    if (hour < 12) return "Good morning!";
-    if (hour < 18) return "Good afternoon!";
-    return "Good evening!";
-  };
-
-  // Make learning cards keyboard accessible
-  document.querySelectorAll(".card").forEach(card => {
-    card.setAttribute("tabindex", "0");
-  });
-
-  // Online/offline connection status
-  function checkConnection() {
-    if (!navigator.onLine) {
-      console.log("You are currently offline.");
-    } else {
-      console.log("You are online.");
-    }
+  // Start learning button
+  if (startButton && dashboard) {
+    startButton.addEventListener("click", function () {
+      dashboard.scrollIntoView({
+        behavior: "smooth"
+      });
+    });
   }
 
-  checkConnection();
+  // Learning module buttons
+  const featureButtons = document.querySelectorAll(".open-btn");
 
-  window.addEventListener("online", checkConnection);
-  window.addEventListener("offline", checkConnection);
+  featureButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const feature = button.getAttribute("data-feature");
 
-  console.log(welcomeMessage() + " Welcome to Nursing Pro NG.");
+      alert(
+        feature + " is coming soon!\n\n" +
+        "We are preparing this learning module for Nursing Pro NG."
+      );
+    });
+  });
+
+  // Registration button
+  const signupButton = document.getElementById("signupBtn");
+
+  if (signupButton) {
+    signupButton.addEventListener("click", function () {
+      alert(
+        "Account registration is coming soon!\n\n" +
+        "We will connect Nursing Pro NG to its online database."
+      );
+    });
+  }
+
+  // Login button
+  const loginButton = document.getElementById("loginBtn");
+
+  if (loginButton) {
+    loginButton.addEventListener("click", function () {
+      alert(
+        "Login is coming soon!\n\n" +
+        "Your personal learning account will be available soon."
+      );
+    });
+  }
+
+  // Mobile menu
+  const menuButton = document.getElementById("menuBtn");
+
+  if (menuButton) {
+    menuButton.addEventListener("click", function () {
+      alert("Welcome to Nursing Pro NG!");
+    });
+  }
+
+  console.log("Nursing Pro NG successfully loaded!");
 
 });
