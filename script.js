@@ -1,6 +1,6 @@
 /* =====================================
    NURSING PRO NG
-   MAIN APPLICATION SCRIPT
+   MAIN APPLICATION
 ===================================== */
 
 const SUPABASE_URL = "https://wcwgegnylgwnylaaijzp.supabase.co";
@@ -8,6 +8,246 @@ const SUPABASE_URL = "https://wcwgegnylgwnylaaijzp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_gwH7Qocg-atzoNAJlnK4ZA_KSaDSJp-";
 
 const SESSION_KEY = "nursingProSession";
+
+
+/* =====================================
+   DISPLAY STUDENT
+===================================== */
+
+function displayStudent(user) {
+
+    const welcome = document.getElementById("studentWelcome");
+
+    if (!welcome || !user) return;
+
+    const name =
+        user.user_metadata?.full_name ||
+        user.email?.split("@")[0] ||
+        "Nursing Student";
+
+    welcome.textContent = `Welcome, ${name}! 👋`;
+}
+
+
+/* =====================================
+   SIGN UP
+===================================== */
+
+async function signup() {
+
+    const fullName = prompt("Enter your full name:");
+
+    if (!fullName || !fullName.trim()) return;
+
+    const email = prompt("Enter your email address:");
+
+    if (!email || !email.trim()) return;
+
+    const password = prompt("Create your password (minimum 8 characters):");
+
+    if (!password) return;
+
+    const confirmPassword = prompt("Confirm your password:");
+
+    if (!confirmPassword) return;
+
+    if (password.length < 8) {
+        alert("Password must contain at least 8 characters.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${SUPABASE_URL}/auth/v1/signup`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY
+                },
+
+                body: JSON.stringify({
+                    email: email.trim(),
+                    password: password,
+                    data: {
+                        full_name: fullName.trim()
+                    }
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.msg ||
+                result.message ||
+                result.error_description ||
+                "Registration failed."
+            );
+        }
+
+        if (result.session && result.user) {
+
+            localStorage.setItem(
+                SESSION_KEY,
+                JSON.stringify(result.session)
+            );
+
+            displayStudent(result.user);
+
+            alert(`Welcome to Nursing Pro NG, ${fullName}!`);
+
+        } else {
+
+            alert(
+                "Account created successfully! Please check your email and confirm your account before logging in."
+            );
+        }
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+/* =====================================
+   LOGIN
+===================================== */
+
+async function login() {
+
+    const email = prompt("Enter your email address:");
+
+    if (!email || !email.trim()) return;
+
+    const password = prompt("Enter your password:");
+
+    if (!password) return;
+
+    try {
+
+        const response = await fetch(
+            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY
+                },
+
+                body: JSON.stringify({
+                    email: email.trim(),
+                    password: password
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.msg ||
+                result.message ||
+                result.error_description ||
+                "Login failed."
+            );
+        }
+
+        localStorage.setItem(
+            SESSION_KEY,
+            JSON.stringify(result)
+        );
+
+        displayStudent(result.user);
+
+        alert("Welcome back to Nursing Pro NG!");
+
+    } catch (error) {
+
+        alert(error.message);
+
+    }
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+function logout() {
+
+    const confirmLogout = confirm(
+        "Are you sure you want to log out?"
+    );
+
+    if (!confirmLogout) return;
+
+    localStorage.removeItem(SESSION_KEY);
+
+    const welcome = document.getElementById("studentWelcome");
+
+    if (welcome) {
+        welcome.textContent = "Welcome, Nursing Student! 👋";
+    }
+
+    alert("You have logged out successfully.");
+
+}
+
+
+/* =====================================
+   RESTORE LOGIN SESSION
+===================================== */
+
+async function restoreSession() {
+
+    const savedSession = localStorage.getItem(SESSION_KEY);
+
+    if (!savedSession) return;
+
+    try {
+
+        const session = JSON.parse(savedSession);
+
+        const response = await fetch(
+            `${SUPABASE_URL}/auth/v1/user`,
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${session.access_token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            localStorage.removeItem(SESSION_KEY);
+
+            return;
+        }
+
+        const user = await response.json();
+
+        displayStudent(user);
+
+    } catch (error) {
+
+        console.log("Session restoration error:", error);
+
+    }
+}
+
 
 /* =====================================
    COURSE MATERIALS
@@ -18,7 +258,7 @@ const courses = {
     "Fundamentals of Nursing": [
         "Introduction to Nursing",
         "History of Nursing",
-        "Nursing Principles",
+        "Principles of Nursing",
         "Nursing Process",
         "Vital Signs",
         "Patient Hygiene",
@@ -43,7 +283,7 @@ const courses = {
         "Pharmacokinetics",
         "Pharmacodynamics",
         "Routes of Drug Administration",
-        "Rights of Medication Administration",
+        "Medication Administration Rights",
         "Drug Calculations",
         "Drug Interactions"
     ],
@@ -113,8 +353,7 @@ const courses = {
         "Female Reproductive System",
         "Menstrual Cycle",
         "Family Planning",
-        "Sexual Health",
-        "Reproductive Health Education"
+        "Sexual Health"
     ],
 
     "Mental Health Nursing": [
@@ -123,8 +362,7 @@ const courses = {
         "Stress and Anxiety",
         "Depression",
         "Psychiatric Nursing",
-        "Therapeutic Communication",
-        "Mental Health Promotion"
+        "Therapeutic Communication"
     ],
 
     "Paediatric Nursing": [
@@ -154,8 +392,7 @@ const courses = {
         "Proteins",
         "Fats and Oils",
         "Vitamins and Minerals",
-        "Balanced Diet",
-        "Nutritional Assessment"
+        "Balanced Diet"
     ],
 
     "Psychology & Sociology": [
@@ -164,8 +401,7 @@ const courses = {
         "Personality",
         "Emotions",
         "Growth and Development",
-        "Social Interaction",
-        "Psychology in Nursing"
+        "Social Interaction"
     ],
 
     "Maternal & Newborn Nursing": [
@@ -177,151 +413,143 @@ const courses = {
         "Newborn Assessment",
         "Breastfeeding"
     ]
+
 };
 
 
 /* =====================================
-   STUDENT WELCOME MESSAGE
+   OPEN COURSE
 ===================================== */
 
-function displayStudent(user) {
+function openCourse(courseName) {
 
-    const welcome = document.getElementById("studentWelcome");
+    const lessons = courses[courseName];
 
-    if (welcome && user) {
+    if (!lessons) {
 
-        const name =
-            user.user_metadata?.full_name ||
-            user.email?.split("@")[0] ||
-            "Nursing Student";
-
-        welcome.textContent = `Welcome, ${name}! 👋`;
-    }
-}
-
-
-/* =====================================
-   STUDENT REGISTRATION
-===================================== */
-
-async function signup() {
-
-    const fullName = prompt("Enter your full name:");
-
-    if (!fullName || !fullName.trim()) return;
-
-    const email = prompt("Enter your email address:");
-
-    if (!email || !email.trim()) return;
-
-    const password = prompt("Create your password (minimum 8 characters):");
-
-    if (!password) return;
-
-    const confirmPassword = prompt("Confirm your password:");
-
-    if (!confirmPassword) return;
-
-    if (password.length < 8) {
-
-        alert("Password must contain at least 8 characters.");
+        alert("Course materials are being prepared.");
 
         return;
     }
 
-    if (password !== confirmPassword) {
+    const lessonList = lessons
+        .map((lesson, index) => `${index + 1}. ${lesson}`)
+        .join("\n");
 
-        alert("Passwords do not match.");
+    alert(
+        courseName +
+        "\n\nCOURSE CONTENT\n\n" +
+        lessonList +
+        "\n\nDetailed lessons will be added next."
+    );
 
-        return;
-    }
-
-    try {
-
-        const response = await fetch(
-            `${SUPABASE_URL}/auth/v1/signup`,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY
-                },
-
-                body: JSON.stringify({
-
-                    email: email.trim(),
-
-                    password: password,
-
-                    data: {
-                        full_name: fullName.trim()
-                    }
-
-                })
-            }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(
-                result.msg ||
-                result.message ||
-                "Registration failed."
-            );
-        }
-
-        if (result.session) {
-
-            localStorage.setItem(
-                SESSION_KEY,
-                JSON.stringify(result.session)
-            );
-
-            displayStudent(result.user);
-
-            alert(`Welcome to Nursing Pro NG, ${fullName}!`);
-
-        } else {
-
-            alert(
-                "Account created! Check your email and confirm your account before logging in."
-            );
-        }
-
-    } catch (error) {
-
-        alert(error.message);
-    }
 }
 
 
 /* =====================================
-   STUDENT LOGIN
+   PAGE BUTTONS
 ===================================== */
 
-async function login() {
+document.addEventListener("DOMContentLoaded", function () {
 
-    const email = prompt("Enter your email address:");
+    // SIGN UP BUTTON
 
-    if (!email || !email.trim()) return;
+    document.getElementById("signupBtn")
+        ?.addEventListener("click", signup);
 
-    const password = prompt("Enter your password:");
 
-    if (!password) return;
+    // LOGIN BUTTON
 
-    try {
+    document.getElementById("loginBtn")
+        ?.addEventListener("click", login);
 
-        const response = await fetch(
-            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-            {
-                method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY
-                },
+    // START LEARNING BUTTON
 
-                body
+    document.getElementById("startLearning")
+        ?.addEventListener("click", function () {
+
+            document.getElementById("dashboard")
+                ?.scrollIntoView({
+                    behavior: "smooth"
+                });
+
+        });
+
+
+    // MENU BUTTON
+
+    document.getElementById("menuBtn")
+        ?.addEventListener("click", function () {
+
+            alert("Welcome to Nursing Pro NG!");
+
+        });
+
+
+    // COURSE BUTTONS
+
+    document.querySelectorAll(".open-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                openCourse(this.dataset.feature);
+
+            });
+
+        });
+
+
+    // SUBSCRIPTION BUTTONS
+
+    document.querySelectorAll(".subscription-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", function () {
+
+                alert(
+                    "Subscription payment is not yet available. No payment will be collected."
+                );
+
+            });
+
+        });
+
+
+    // ADMIN BUTTON
+
+    document.getElementById("adminBtn")
+        ?.addEventListener("click", function () {
+
+            alert("Admin dashboard is under development.");
+
+        });
+
+
+    // RESTORE SESSION
+
+    restoreSession();
+
+});
+
+
+/* =====================================
+   OFFLINE SUPPORT
+===================================== */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", function () {
+
+        navigator.serviceWorker.register("./service-worker.js")
+
+            .catch(error => {
+
+                console.log("Offline support error:", error);
+
+            });
+
+    });
+
+}
