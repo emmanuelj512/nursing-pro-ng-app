@@ -1,155 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Nursing Pro NG</title>
+    <title>Nursing Pro NG</title>
 
-  <meta name="description" content="Your online nursing and healthcare learning platform.">
+    <meta name="description" content="Your Knowledge. Your Skills. Your Nursing Future.">
 
-  <meta name="theme-color" content="#071426">
+    <meta name="theme-color" content="#071426">
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
-  <header class="topbar">
-    <div class="logo">NURSING <span>PRO NG</span></div>
-    <button id="menuBtn" aria-label="Open menu">☰</button>
-  </header>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <span>✚</span> Nursing Pro NG
+        </div>
 
-  <main>
+        <button id="menuBtn" class="menu-btn">☰</button>
+    </header>
 
+    <!-- HERO SECTION -->
     <section class="hero">
-      <p class="tagline">YOUR KNOWLEDGE. YOUR SKILLS. YOUR NURSING FUTURE.</p>
 
-      <h1>Welcome to Nursing Pro NG</h1>
+        <p class="welcome">WELCOME TO NURSING PRO NG</p>
 
-      <p>
-        Your personal learning platform for nursing education,
-        clinical skills and professional development.
-      </p>
+        <h1>
+            Your Knowledge.<br>
+            Your Skills.<br>
+            <span>Your Nursing Future.</span>
+        </h1>
 
-      <button class="primary-btn" id="startLearning">
-        Start Learning →
-      </button>
+        <p class="hero-text">
+            Learn nursing, improve your clinical skills,
+            understand medications and prepare for your
+            nursing examinations.
+        </p>
+
+        <button id="startLearning" class="primary-btn">
+            Start Learning →
+        </button>
+
+        <div class="auth-buttons">
+            <button id="signupBtn" class="secondary-btn">
+                Create Account
+            </button>
+
+            <button id="loginBtn" class="secondary-btn">
+                Login
+            </button>
+        </div>
+
     </section>
 
-    <section class="auth-section" id="authSection">
-      <h2>Join Nursing Pro NG</h2>
-      <p>Create an account or log in to access your learning dashboard.</p>
+    <!-- DASHBOARD -->
+    <main id="dashboard">
 
-      <button class="primary-btn" id="signupBtn">Create Account</button>
-      <button class="secondary-btn" id="loginBtn">Login</button>
+        <section class="dashboard-heading">
+            <p class="section-label">YOUR LEARNING SPACE</p>
+            <h2>Nursing Dashboard</h2>
 
-      <p class="small-note">
-        Account authentication will be activated when our online
-        database is connected.
-      </p>
-    </section>
+            <p>
+                Everything you need to grow in your nursing journey.
+            </p>
+        </section>
 
-    <section class="dashboard" id="dashboard">
-      <h2>Your Learning Dashboard</h2>
-      <p>Explore your nursing learning resources.</p>
+        <div class="dashboard-grid">
 
-      <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h3>Nursing Notes</h3>
+                <p>Study nursing subjects and important topics.</p>
+                <button class="open-btn" data-feature="Nursing Notes">
+                    Explore →
+                </button>
+            </div>
 
-        <article class="card">
-          <div class="icon">📚</div>
-          <h3>Nursing Notes</h3>
-          <p>Study important nursing subjects and topics.</p>
-          <button class="open-btn" data-feature="Nursing Notes">Explore</button>
-        </article>
+            <div class="card">
+                <div class="card-icon">💊</div>
+                <h3>Drug Guide</h3>
+                <p>Learn about medications and pharmacology.</p>
+                <button class="open-btn" data-feature="Drug Guide">
+                    Explore →
+                </button>
+            </div>
 
-        <article class="card">
-          <div class="icon">💊</div>
-          <h3>Drug Guide</h3>
-          <p>Learn pharmacology and medication safety.</p>
-          <button class="open-btn" data-feature="Drug Guide">Explore</button>
-        </article>
+            <div class="card">
+                <div class="card-icon">🧮</div>
+                <h3>Dosage Calculator</h3>
+                <p>Practise medication and dosage calculations.</p>
+                <button class="open-btn" data-feature="Dosage Calculator">
+                    Explore →
+                </button>
+            </div>
 
-        <article class="card">
-          <div class="icon">🧮</div>
-          <h3>Drug Calculations</h3>
-          <p>Practise dosage and IV calculations.</p>
-          <button class="open-btn" data-feature="Drug Calculations">Explore</button>
-        </article>
+            <div class="card">
+                <div class="card-icon">🏥</div>
+                <h3>Clinical Posting</h3>
+                <p>Prepare for hospital postings and clinical practice.</p>
+                <button class="open-btn" data-feature="Clinical Posting">
+                    Explore →
+                </button>
+            </div>
 
-        <article class="card">
-          <div class="icon">🏥</div>
-          <h3>Clinical Posting</h3>
-          <p>Prepare for hospital postings and procedures.</p>
-          <button class="open-btn" data-feature="Clinical Posting">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">👶</div>
-          <h3>Paediatric Nursing</h3>
-          <p>Learn about newborn and child healthcare.</p>
-          <button class="open-btn" data-feature="Paediatric Nursing">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">🚑</div>
-          <h3>Emergency Nursing</h3>
-          <p>Study emergency care and basic life support.</p>
-          <button class="open-btn" data-feature="Emergency Nursing">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">📝</div>
-          <h3>CBT Practice</h3>
-          <p>Test your knowledge with nursing questions.</p>
-          <button class="open-btn" data-feature="CBT Practice">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">🤖</div>
-          <h3>AI Nursing Tutor</h3>
-          <p>Get help understanding nursing concepts.</p>
-          <button class="open-btn" data-feature="AI Nursing Tutor">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">📖</div>
-          <h3>PDF Library</h3>
-          <p>Access nursing study materials.</p>
-          <button class="open-btn" data-feature="PDF Library">Explore</button>
-        </article>
-
-        <article class="card">
-          <div class="icon">📊</div>
-          <h3>My Progress</h3>
-          <p>Monitor your learning activities.</p>
-          <button class="open-btn" data-feature="My Progress">Explore</button>
-        </article>
-
-      </div>
-    </section>
-
-    <section class="notice">
-      <h3>Important Nursing Notice</h3>
-      <p>
-        Nursing Pro NG is an educational platform.
-        Always follow your institution's guidelines, clinical
-        supervision and approved healthcare protocols.
-        Never use educational calculators as a substitute
-        for professional medication verification.
-      </p>
-    </section>
-
-  </main>
-
-  <footer>
-    <h3>NURSING PRO NG</h3>
-    <p>Your Knowledge. Your Skills. Your Nursing Future.</p>
-    <p>© 2026 Nursing Pro NG. All rights reserved.</p>
-  </footer>
-
-  <script src="script.js"></script>
-
-</body>
-    </html>
+            <div class="card">
+                <div class="card-icon">🚑</div>
+                <h3>Emergency &
