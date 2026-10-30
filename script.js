@@ -552,4 +552,4 @@ if ("serviceWorker" in navigator) {
 
     });
 
-}
+        }
