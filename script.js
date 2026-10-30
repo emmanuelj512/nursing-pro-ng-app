@@ -1,35 +1,35 @@
-// =====================================
-// NURSING PRO NG
-// SUPABASE AUTHENTICATION
-// =====================================
-
 const SUPABASE_URL = "https://wcwgegnylgwnylaaijzp.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_gwH7Qocg-atzoNAJlnK4ZA_KSaDSJp-";
 
-// =====================================
-// CREATE ACCOUNT
-// =====================================
+const SESSION_KEY = "nursingProSession";
 
+// SIGN UP
 async function signup() {
+    const fullName = prompt("Enter your full name:");
+    if (!fullName || !fullName.trim()) return;
 
     const email = prompt("Enter your email address:");
+    if (!email || !email.trim()) return;
 
-    if (!email) return;
-
-    const password = prompt("Create a password (minimum 6 characters):");
-
+    const password = prompt("Create your password (minimum 8 characters):");
     if (!password) return;
 
-    if (password.length < 6) {
-        alert("Password must contain at least 6 characters.");
+    const confirmPassword = prompt("Confirm your password:");
+    if (!confirmPassword) return;
+
+    if (password.length < 8) {
+        alert("Your password must contain at least 8 characters.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Your passwords do not match.");
         return;
     }
 
     try {
-
         const response = await fetch(
-            SUPABASE_URL + "/auth/v1/signup",
+            `${SUPABASE_URL}/auth/v1/signup`,
             {
                 method: "POST",
                 headers: {
@@ -38,7 +38,10 @@ async function signup() {
                 },
                 body: JSON.stringify({
                     email: email.trim(),
-                    password: password
+                    password: password,
+                    data: {
+                        full_name: fullName.trim()
+                    }
                 })
             }
         );
@@ -46,38 +49,32 @@ async function signup() {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.msg || result.message || "Registration failed.");
+            throw new Error(result.msg || result.message || result.error_description || "Registration failed.");
         }
 
-        alert(
-            "Registration successful! Check your email if confirmation is required."
-        );
+        if (result.session) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(result.session));
+            alert(`Welcome to Nursing Pro NG, ${fullName}!`);
+        } else {
+            alert("Your account has been created. Please check your email to confirm your account before logging in.");
+        }
 
     } catch (error) {
-
-        alert("Registration error: " + error.message);
-
+        alert(error.message);
     }
 }
 
-// =====================================
 // LOGIN
-// =====================================
-
 async function login() {
-
     const email = prompt("Enter your email address:");
-
-    if (!email) return;
+    if (!email || !email.trim()) return;
 
     const password = prompt("Enter your password:");
-
     if (!password) return;
 
     try {
-
         const response = await fetch(
-            SUPABASE_URL + "/auth/v1/token?grant_type=password",
+            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
             {
                 method: "POST",
                 headers: {
@@ -94,78 +91,65 @@ async function login() {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.msg || result.message || "Login failed.");
+            throw new Error(result.msg || result.message || result.error_description || "Login failed.");
         }
 
-        localStorage.setItem(
-            "nursingProSession",
-            JSON.stringify(result)
-        );
+        if (result.session || result.access_token) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify(result));
+        }
 
         alert("Welcome back to Nursing Pro NG!");
 
     } catch (error) {
-
-        alert("Login error: " + error.message);
-
+        alert(error.message);
     }
 }
 
-// =====================================
-// BUTTONS
-// =====================================
-
+// PAGE BUTTONS
 document.addEventListener("DOMContentLoaded", function () {
 
-    const signupButton = document.getElementById("signupBtn");
-    const loginButton = document.getElementById("loginBtn");
-    const startButton = document.getElementById("startLearning");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const startLearning = document.getElementById("startLearning");
+    const menuBtn = document.getElementById("menuBtn");
 
-    if (signupButton) {
-        signupButton.addEventListener("click", signup);
+    if (signupBtn) {
+        signupBtn.addEventListener("click", signup);
     }
 
-    if (loginButton) {
-        loginButton.addEventListener("click", login);
+    if (loginBtn) {
+        loginBtn.addEventListener("click", login);
     }
 
-    if (startButton) {
-        startButton.addEventListener("click", function () {
-
+    if (startLearning) {
+        startLearning.addEventListener("click", function () {
             document.getElementById("dashboard")?.scrollIntoView({
                 behavior: "smooth"
             });
-
         });
     }
 
+    if (menuBtn) {
+        menuBtn.addEventListener("click", function () {
+            alert("Nursing Pro NG menu");
+        });
+    }
+
+    // MODULE BUTTONS
     document.querySelectorAll(".open-btn").forEach(button => {
-
         button.addEventListener("click", function () {
-
-            const feature = this.getAttribute("data-feature");
+            const feature = this.dataset.feature || "This feature";
 
             alert(feature + " is coming soon!");
-
         });
-
     });
 
 });
 
-// =====================================
 // OFFLINE SUPPORT
-// =====================================
-
 if ("serviceWorker" in navigator) {
-
     window.addEventListener("load", function () {
-
         navigator.serviceWorker.register("./service-worker.js")
-            .catch(error => console.log(error));
-
+            .catch(error => console.log("Offline support error:", error));
     });
-
-}
-
-console.log("Nursing Pro NG loaded successfully!");
+    }
