@@ -3,6 +3,20 @@ const SUPABASE_KEY = "sb_publishable_gwH7Qocg-atzoNAJlnK4ZA_KSaDSJp-";
 
 const SESSION_KEY = "nursingProSession";
 
+// DISPLAY STUDENT NAME
+function displayStudent(user) {
+    const welcome = document.getElementById("studentWelcome");
+
+    if (welcome && user) {
+        const name =
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "Nursing Student";
+
+        welcome.textContent = `Welcome, ${name}! 👋`;
+    }
+}
+
 // SIGN UP
 async function signup() {
     const fullName = prompt("Enter your full name:");
@@ -18,12 +32,12 @@ async function signup() {
     if (!confirmPassword) return;
 
     if (password.length < 8) {
-        alert("Your password must contain at least 8 characters.");
+        alert("Password must contain at least 8 characters.");
         return;
     }
 
     if (password !== confirmPassword) {
-        alert("Your passwords do not match.");
+        alert("Passwords do not match.");
         return;
     }
 
@@ -38,7 +52,7 @@ async function signup() {
                 },
                 body: JSON.stringify({
                     email: email.trim(),
-                    password: password,
+                    password,
                     data: {
                         full_name: fullName.trim()
                     }
@@ -49,14 +63,22 @@ async function signup() {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.msg || result.message || result.error_description || "Registration failed.");
+            throw new Error(
+                result.msg || result.message || "Registration failed."
+            );
         }
 
         if (result.session) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify(result.session));
+            localStorage.setItem(
+                SESSION_KEY,
+                JSON.stringify(result.session)
+            );
+            displayStudent(result.user);
             alert(`Welcome to Nursing Pro NG, ${fullName}!`);
         } else {
-            alert("Your account has been created. Please check your email to confirm your account before logging in.");
+            alert(
+                "Account created! Please check your email and confirm your account before logging in."
+            );
         }
 
     } catch (error) {
@@ -83,7 +105,7 @@ async function login() {
                 },
                 body: JSON.stringify({
                     email: email.trim(),
-                    password: password
+                    password
                 })
             }
         );
@@ -91,12 +113,17 @@ async function login() {
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.msg || result.message || result.error_description || "Login failed.");
+            throw new Error(
+                result.msg || result.message || "Login failed."
+            );
         }
 
-        if (result.session || result.access_token) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify(result));
-        }
+        localStorage.setItem(
+            SESSION_KEY,
+            JSON.stringify(result)
+        );
+
+        displayStudent(result.user);
 
         alert("Welcome back to Nursing Pro NG!");
 
@@ -105,51 +132,72 @@ async function login() {
     }
 }
 
+// RESTORE LOGIN SESSION
+async function restoreSession() {
+    const savedSession = localStorage.getItem(SESSION_KEY);
+
+    if (!savedSession) return;
+
+    try {
+        const session = JSON.parse(savedSession);
+
+        const response = await fetch(
+            `${SUPABASE_URL}/auth/v1/user`,
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${session.access_token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            localStorage.removeItem(SESSION_KEY);
+            return;
+        }
+
+        const user = await response.json();
+        displayStudent(user);
+
+    } catch (error) {
+        console.log("Session restoration error:", error);
+    }
+}
+
 // PAGE BUTTONS
 document.addEventListener("DOMContentLoaded", function () {
 
-    const signupBtn = document.getElementById("signupBtn");
-    const loginBtn = document.getElementById("loginBtn");
-    const startLearning = document.getElementById("startLearning");
-    const menuBtn = document.getElementById("menuBtn");
+    document.getElementById("signupBtn")
+        ?.addEventListener("click", signup);
 
-    if (signupBtn) {
-        signupBtn.addEventListener("click", signup);
-    }
+    document.getElementById("loginBtn")
+        ?.addEventListener("click", login);
 
-    if (loginBtn) {
-        loginBtn.addEventListener("click", login);
-    }
-
-    if (startLearning) {
-        startLearning.addEventListener("click", function () {
-            document.getElementById("dashboard")?.scrollIntoView({
-                behavior: "smooth"
-            });
+    document.getElementById("startLearning")
+        ?.addEventListener("click", function () {
+            document.getElementById("dashboard")
+                ?.scrollIntoView({ behavior: "smooth" });
         });
-    }
 
-    if (menuBtn) {
-        menuBtn.addEventListener("click", function () {
+    document.getElementById("menuBtn")
+        ?.addEventListener("click", function () {
             alert("Nursing Pro NG menu");
         });
-    }
 
-    // MODULE BUTTONS
     document.querySelectorAll(".open-btn").forEach(button => {
         button.addEventListener("click", function () {
             const feature = this.dataset.feature || "This feature";
-
             alert(feature + " is coming soon!");
         });
     });
 
+    restoreSession();
 });
 
 // OFFLINE SUPPORT
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
         navigator.serviceWorker.register("./service-worker.js")
-            .catch(error => console.log("Offline support error:", error));
+            .catch(error => console.log(error));
     });
-    }
+}
